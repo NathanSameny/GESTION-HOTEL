@@ -1,0 +1,143 @@
+from random import randrange
+import random
+class JeuDeCartes(object):
+    couleur = ('Pique', 'Trèfle', 'Carreau', 'Cœur')
+    valeur = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 'valet', 'dame', 'roi', 'as')
+
+    def __init__(self):
+        self.carte = []
+        for coul in range(4):
+            for val in range(13):
+                self.carte.append((val + 2, coul))
+
+    def nom_carte(self, c):
+        return "{0} de {1}".format(self.valeur[c[0]], self.couleur[c[1]])
+
+    def battre(self):
+        t = len(self.carte)
+        for i in range(t):
+            h1, h2 = randrange(t), randrange(t)
+            self.carte[h1], self.carte[h2] = self.carte[h2], self.carte[h1]
+
+    def tirer(self):
+        t = len(self.carte)
+        if t > 0:
+            carte = self.carte[0]
+            del(self.carte[0])
+            return carte
+        else:
+            return None
+
+if __name__ == '__main__':
+    jeu = JeuDeCartes()
+    jeu.battre()
+
+    joueur_A = []
+    joueur_B = []
+
+    # Tirer 9 cartes au total
+    for _ in range(9):
+        carte = jeu.tirer()
+        if carte:
+            if len(joueur_A) < 4:
+                joueur_A.append(carte)
+            elif len(joueur_B) < 4:
+                joueur_B.append(carte)
+
+    # La carte restante est attribuée à la table
+    carte_table = jeu.tirer()
+
+    # Afficher les cartes restantes
+    for _ in range(len(jeu.carte)):
+        c = jeu.tirer()
+        if c:
+            print(jeu.nom_carte(c))
+        else:
+            print('Terminé !')
+
+    # Afficher les cartes de chaque joueur et la carte à la table
+    print("Cartes du joueur A:", [jeu.nom_carte(c) for c in joueur_A])
+    print("Cartes du joueur B:", [jeu.nom_carte(c) for c in joueur_B])
+    print("Carte à la table:", jeu.nom_carte(carte_table))
+if len(joueur_A) < 4 :
+    print("le 1er joueur est ",joueur_A)
+    print("le 2er joueur est",joueur_B)
+else :
+    print("le 1er joueur est ", joueur_B)
+    print("le 2er joueur est", joueur_A)
+    
+def jouer_carte(carte, table, joueur):
+    """Joue une carte sur la table"""
+    if jeu.nom_carte(carte_table)== '7':
+        suivant = (joueur + 1) % len(table)
+        table[suivant].extend(random.sample(table[suivant], 2))
+    if jeu.nom_carte(carte_table) == 'As':
+        suivant = (joueur + 1) % len(table)
+        table[suivant].append(table[joueur].pop())
+    elif jeu.nom_carte(carte_table)== 'Valet':
+        nouvelle_couleur = input("Nouvelle couleur : ")
+        table[joueur].remove(jeu.nom_carte(carte_table))
+        table[joueur].append((nouvelle_couleur, jeu.nom_carte(carte_table)))
+    
+    return table
+
+def changer_table(table):
+    """Change la carte de table si nécessaire"""
+    if table[-1][1] in ['7', 'As']:
+        table.insert(0, table.pop())
+    elif table[-1][1] == 'Valet':
+        table.insert(0, table.pop())
+        premiere_carte = random.choice(table[0])
+        nouvelle_couleur = input("Nouvelle couleur : ")
+        table[0].remove(premiere_carte)
+        table[0].append((nouvelle_couleur, premiere_carte[1]))
+    return table
+
+def jouer_une_partie():
+    """Joue une partie de jeu de cartes"""
+    jeu = JeuDeCartes()
+    joueurs=2
+    carte_table=jeu.tirer()
+    while True:
+        print("Table :", carte_table)
+        #print("Joueur A :",joueur_A)
+        carte_jouee = input("Carte à jouer : ")
+        carte_jouee = (carte_jouee[:-1], carte_jouee[-1])
+        if  jeu.tirer() not in []:
+            print("en banque")
+            joueur_A.append(jeu.carte)
+        elif carte_jouee in joueur_A:
+            continue
+        carte_table= jouer_carte(carte_jouee,jeu.tirer(), joueur_A)
+        joueurs[joueur_A].remove(carte_jouee)
+        if len(joueur_A) == 0  :
+            print("Joueur",joueur_A, "a gagné !")
+        else:
+            print("non")
+            break
+        table = changer_table(carte_table)
+        joueur_A= (joueur_A + 1) % len(joueur_A)
+    if __name__ =='__main__':
+      Jeu=JeuDeCartes()
+      joueur_A=[jeu.tirer()for __ in range(4)]
+      joueur_B=[jeu.tirer()for __ in range(4)]   
+      Banque=[]
+      for __ in range(30):
+          carte_table =jeu.tirer()
+          print(f"\n carte sur la table:{jeu.nom_carte(carte_table)}") 
+          joueur_joue_carte('A',joueur_A,carte_table,Banque)
+          joueur_joue_carte('B',joueur_B,carte_table,Banque)
+          if not joueur_A or not joueur_B:
+              print("Fin du jeu.")
+              if not joueur_A and not joueur_B: 
+                  print("Match nul:Aucun joueur n'a de carte")
+              elif not joueur_A:
+                  print("Le joueur B a gagner:Le joueur A n'a plus de carte") 
+              else:
+                  print("Le joueur A a gagner:Le joueur B n'a plus de carte")
+              break    
+      print("\n Banque des cartes utilisées:")
+      for cartes in Banque:
+          print(jeu.nom_carte(carte))                            
+# Jouer une partie
+jouer_une_partie()
